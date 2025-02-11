@@ -29,6 +29,7 @@ def lien_recup(lien):
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--user-data-dir=/tmp/chrome-user-data")
     
     driver= webdriver.Chrome(options=chrome_options)
     try:

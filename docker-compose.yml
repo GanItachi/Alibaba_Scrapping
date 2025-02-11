@@ -1,0 +1,103 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: api-container
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    #healthcheck:
+    #test: ["CMD", "curl", "-f", "http://api-container:8000"]
+    #interval: 30s
+    #timeout: 10s
+    #retries: 3
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    networks:
+      - monitoring_network # 🔥 Associer l'API au réseau
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    env_file:
+      - .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - monitoring_network #
+
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - monitoring_network #
+
+  #celery_worker:
+  #build:
+  #context: .
+  #dockerfile: api/Dockerfile.celery
+  #container_name: celery_worker
+  #env_file:
+  #  - .env
+  #depends_on:
+  # - redis
+  #- api
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    #depends_on:
+    #api:
+    #condition: service_healthy
+    networks:
+      - monitoring_network
+
+  grafana:
+    image: grafana/grafana-enterprise:10.4.3
+    container_name: grafana
+    ports:
+      - "3100:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana # Persistance des dashboards
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards # Dashboards personnalisés (optionnel)
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin # À changer en prod !
+    networks:
+      - monitoring_network # Même réseau que Prometheus
+    depends_on:
+      - prometheus
+
+networks:
+  monitoring_network:
+
+volumes:
+  pg_data:
+  grafana_data:

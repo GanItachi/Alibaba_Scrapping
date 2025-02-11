@@ -33,7 +33,7 @@ def insert_data(data: dict):
 
     print(f"{len(values)} nouvelles entrées ajoutées.")
 
-DATABASE_URL = "postgresql://GanToma:232003@localhost:5432/alibaba_scraper"
+DATABASE_URL = "postgresql://GanToma:232003@postgres_db:5432/alibaba_scraper"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
