@@ -42,6 +42,22 @@ services:
     networks:
       - monitoring_network #
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - db
+    networks:
+      - monitoring_network #
+
   redis:
     image: redis:7
     container_name: redis_cache
@@ -100,4 +116,5 @@ networks:
 
 volumes:
   pg_data:
+  pgadmin-data:
   grafana_data:
