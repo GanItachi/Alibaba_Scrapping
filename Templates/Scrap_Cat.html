@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alibaba Scraper</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/New.css') }}"
+      media="screen"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/Home.css') }}"
+      media="screen"
+    />
+  </head>
+  <body>
+    {% include 'header2.html' %}
+
+    <div class="main-container">
+      <div class="container large">
+        <h1>Alibaba Scraper</h1>
+        <form action="/scrape/" method="post">
+          <button type="submit" onclick="startScraping()">
+            Démarrer le Scraping
+          </button>
+        </form>
+        <div class="message">
+          {% if message %}
+          <p>{{ message }}</p>
+          {% endif %}
+        </div>
+        <div id="loading">
+          <p>Scraping en cours...</p>
+          <div class="spinner"></div>
+          <div class="pl">
+            <div class="pl__outer-ring"></div>
+            <div class="pl__inner-ring"></div>
+            <div class="pl__track-cover"></div>
+            <div class="pl__ball">
+              <div class="pl__ball-texture"></div>
+              <div class="pl__ball-outer-shadow"></div>
+              <div class="pl__ball-inner-shadow"></div>
+              <div class="pl__ball-side-shadows"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-container new">
+        <div class="results-header">
+          <h2>
+            Résultats du scraping :
+            <span
+              class="{% if etat is defined and etat >= 200 and etat < 300 %}success {% elif etat is defined and etat >= 300 and etat < 500 %}warning {% elif etat is defined and etat >= 500 %}error {% else %}normal{% endif %}"
+            >
+              {{ etat if etat is defined else " " }}
+            </span>
+          </h2>
+          {%if taille is defined %}
+          <span class="taille-badge"> {{ taille }} elements </span>
+          {% endif %}
+        </div>
+
+        <div class="scrollable">
+          <ul>
+            {% for category in categories %}
+            <li>
+              <a href="{{ category.link }}" target="_blank"
+                >{{ category.title }}</a
+              >
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <h2>Exporter en JSON :</h2>
+        <label for="jsonOutput">Données JSON récupérées :</label>
+        {% if categories_dict %}
+        <textarea id="jsonOutput" readonly>
+  {{ categories_dict|tojson(indent=4) }}</textarea
+        >
+        {% else %}
+        <p>Aucune donnée disponible.</p>
+        {% endif %}
+        <button onclick="copyJson()">Copier JSON</button>
+      </div>
+    </div>
+
+    <script>
+      function startScraping() {
+        document.getElementById("loading").style.display = "block";
+      }
+
+      function copyJson() {
+        let jsonText = document.getElementById("jsonOutput");
+        jsonText.select();
+        document.execCommand("copy");
+        alert("JSON copié !");
+      }
+    </script>
+  </body>
+</html>

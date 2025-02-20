@@ -1,0 +1,513 @@
+body {
+  font-family: Arial, sans-serif;
+  padding-top: 80px;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.flat {
+  margin: auto;
+  height: 160px;
+  width: 160px;
+  border-radius: 50%;
+  background: #f0f0f3;
+  box-shadow: -10px -10px 30px #fff, 10px 10px 30px #aeaec040;
+}
+
+.convex {
+  margin: auto;
+  height: 160px;
+  width: 160px;
+  border-radius: 50%;
+  background: #f0f0f3;
+  box-shadow: -10px -10px 30px #fff, 10px 10px 30px #aeaec040,
+    inset -10px -10px 10px #aeaec025, inset 10px 10px 10px #fff;
+}
+
+.concave {
+  margin: auto;
+  height: 160px;
+  width: 160px;
+  border-radius: 50%;
+  background: #f0f0f3;
+  box-shadow: inset -10px -10px 10px #ffffff70, inset 10px 10px 10px #aeaec020;
+}
+
+.main-container {
+  display: grid;
+  grid-template-columns: repeat(2, 100px); /* 3 colonnes */
+  grid-template-rows: repeat(2, 100px); /* 3 lignes */
+  gap: 10px; /* Espacement */
+  width: 330px;
+  display: flex;
+  gap: 20px;
+  margin-top: 60px; /* Ajuste selon la hauteur du header */
+  top: 80px;
+  padding: 80px;
+}
+
+.container {
+  background-color: white;
+  padding: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+
+  margin-top: 60px; /* Ajuste selon la hauteur du header */
+  /*top: 80px;
+  padding: 80px;*/
+}
+
+h1,
+h2 {
+  color: #333;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #06f6ea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.message {
+  color: green;
+  margin-top: 20px;
+}
+
+#loading {
+  display: none;
+  margin-bottom: 500px;
+}
+
+.spinner {
+  border: 5px solid rgba(0, 0, 0, 0);
+  border-left-color: #f4f4f400;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.results-container {
+  /*width: 80%;
+    max-width: 600px;*/
+  background: white;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  /*margin-top: 10px;*/
+  margin-top: 60px;
+}
+
+.scrollable {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #fafafa;
+  margin-top: 20px;
+}
+.new {
+  position: absolute;
+  top: 10px;
+  left: 370px;
+  width: 920px;
+  height: 600px;
+}
+.small {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 100px;
+  height: 100px;
+  background-color: red;
+}
+
+.medium {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 150px;
+  height: 150px;
+  background-color: blue;
+}
+
+.large {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 270px;
+  height: 200px;
+  /*background-color: rgb(9, 173, 223);*/
+}
+
+.category-box {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: #06f6ea;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+  text-align: center;
+  /*margin-top: 10px;*/
+}
+
+.text_spec {
+  font-style: bold italic;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  color: red;
+  font-size: 18px;
+}
+
+.success {
+  background-color: #d4edda; /* Vert clair */
+  color: #155724;
+  border: 1px solid #155724;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.warning {
+  background-color: #fff3cd; /* Jaune clair */
+  color: #856404;
+  border: 1px solid #856404;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.error {
+  background-color: #f8d7da; /* Rouge clair */
+  color: #721c24;
+  border: 1px solid #721c24;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.normal {
+  background-color: #76c1d8;
+  color: rgb(0, 234, 255); /* Etat normal */
+  border: 1px solid rgb(0, 234, 255);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  resize: none;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.results-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between; /* Place le titre à gauche et la taille à droite */
+  align-items: center; /* Aligne verticalement */
+  /*margin-bottom: 20px;*/
+  margin-top: 10px;
+}
+
+.results-header h2 {
+  margin: 0; /* Supprime le margin qui pourrait créer un décalage */
+  flex-grow: 1; /* Permet à h2 de s’adapter */
+}
+
+.taille-badge {
+  background-color: #0af1d7; /* Bleu */
+  color: white;
+  padding: 4px 8px;
+  border: solid rgb(0, 234, 255);
+  border-radius: 4px;
+  font-size: 20px;
+  font-weight: bold;
+  white-space: nowrap; /* Empêche la valeur de passer à la ligne */
+}
+
+/* Barre d'entête */
+.header {
+  position: fixed;
+  height: 20px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Assure qu'il est au-dessus des autres éléments */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #067b77;
+  padding: 15px 30px;
+  color: white;
+}
+
+/* Logo à droite */
+.logo img {
+  height: 50px; /* Ajuster la taille du logo */
+}
+
+/* Menu à gauche */
+.nav-links {
+  display: flex;
+  gap: 20px; /* Espacement entre les boutons */
+  margin-left: auto;
+  margin-right: 50px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.nav-links a:hover {
+  background-color: #ce950690;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .nav-links {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Espacement entre les boutons */
+  justify-content: center; /* Centre les boutons horizontalement */
+  margin-top: 10px; /* Ajoute un peu d'espace en haut */
+}
+
+.button-container button {
+  position: relative;
+  width: 500px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  background-color: #06f6ea;
+  color: white;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+  bottom: 0px;
+}
+
+.button-container button:hover {
+  background-color: #00b3ad89;
+}
+
+/**********************************************************************************************/
+
+.pl,
+.pl__ball,
+.pl__ball-inner-shadow,
+.pl__ball-side-shadows,
+.pl__ball-texture,
+.pl__inner-ring,
+.pl__outer-ring,
+.pl__track-cover {
+  border-radius: 50%;
+}
+.pl {
+  position: relative;
+  width: 16em;
+  height: 16em;
+}
+.pl__ball,
+.pl__ball-inner-shadow,
+.pl__ball-outer-shadow,
+.pl__ball-side-shadows,
+.pl__ball-texture,
+.pl__ball-texture:before,
+.pl__inner-ring,
+.pl__outer-ring,
+.pl__track-cover {
+  position: absolute;
+}
+.pl__ball,
+.pl__ball-inner-shadow,
+.pl__ball-outer-shadow,
+.pl__ball-texture:before,
+.pl__track-cover {
+  animation: ball 3s linear infinite;
+}
+.pl__ball {
+  top: calc(50% - 1.25em);
+  left: calc(50% - 1.25em);
+  transform: rotate(0) translateY(-6.5em);
+  width: 2.5em;
+  height: 2.5em;
+}
+.pl__ball-inner-shadow {
+  animation-name: ballInnerShadow;
+  box-shadow: 0 0.1em 0.2em hsla(0, 0%, 0%, 0.3),
+    0 0 0.2em hsla(0, 0%, 0%, 0.1) inset,
+    0 -1em 0.5em hsla(0, 0%, 0%, 0.15) inset;
+  width: 100%;
+  height: 100%;
+}
+.pl__ball-outer-shadow {
+  animation-name: ballOuterShadow;
+  background-image: linear-gradient(hsla(0, 0%, 0%, 0.15), hsla(0, 0%, 0%, 0));
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  filter: blur(2px);
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 250%;
+  transform: rotate(20deg);
+  transform-origin: 50% 0;
+  z-index: -2;
+}
+.pl__ball-side-shadows {
+  background-color: hsla(0, 0%, 0%, 0.1);
+  filter: blur(2px);
+  width: 100%;
+  height: 100%;
+  transform: scale(0.75, 1.1);
+  z-index: -1;
+}
+.pl__ball-texture {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  transform: translate3d(0, 0, 0);
+}
+.pl__ball-texture:before {
+  animation-name: ballTexture;
+  animation-duration: 0.25s;
+  background: url(https://assets.codepen.io/416221/snow.jpg) 0 0 / 50% 100%;
+  content: "";
+  display: block;
+  filter: brightness(1.05);
+  top: 0;
+  right: 0;
+  width: 200%;
+  height: 100%;
+}
+.pl__inner-ring {
+  box-shadow: 0 -0.25em 0.5em hsla(0, 0%, 100%, 0.4),
+    0 0.5em 0.75em hsla(0, 0%, 100%, 0.4) inset,
+    0 0.5em 0.375em hsla(0, 0%, 0%, 0.15),
+    0 -0.5em 0.75em hsla(0, 0%, 0%, 0.15) inset;
+  top: 2.375em;
+  left: 2.375em;
+  width: calc(100% - 4.75em);
+  height: calc(100% - 4.75em);
+}
+.pl__outer-ring {
+  box-shadow: 0 -0.45em 0.375em hsla(0, 0%, 0%, 0.15),
+    0 0.5em 0.75em hsla(0, 0%, 0%, 0.15) inset,
+    0 0.25em 0.5em hsla(0, 0%, 100%, 0.4),
+    0 -0.5em 0.75em hsla(0, 0%, 100%, 0.4) inset;
+  top: 0.75em;
+  left: 0.75em;
+  width: calc(100% - 1.5em);
+  height: calc(100% - 1.5em);
+}
+.pl__track-cover {
+  animation-name: trackCover;
+  background-image: conic-gradient(
+    #f4f4f4 210deg,
+    hsla(223, 90%, 95%, 0) 270deg
+  );
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Animations */
+@keyframes ball {
+  from {
+    transform: rotate(0) translateY(-6.5em);
+  }
+  50% {
+    transform: rotate(180deg) translateY(-6em);
+  }
+  to {
+    transform: rotate(360deg) translateY(-6.5em);
+  }
+}
+@keyframes ballInnerShadow {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes ballOuterShadow {
+  from {
+    transform: rotate(20deg);
+  }
+  to {
+    transform: rotate(-340deg);
+  }
+}
+@keyframes ballTexture {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+@keyframes trackCover {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

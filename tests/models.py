@@ -1,39 +1,40 @@
-from .database import Base
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, JSON, Float, Date
+from sqlalchemy.orm import relationship
+from api.database import Base
 
-
+# ✅ Table des Catégories
 class Categorie(Base):
     __tablename__ = "categories"
-
-    title = Column(String, index=True, primary_key=True)
-    link = Column(String)
-    
-     # Relation avec les produits
-    products = relationship("Produit", back_populates="categorie")
-    
-class Produit(Base):
-    __tablename__ = "products"
+    __table_args__ = {"schema": "public"}  
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    link = Column(String)
-    categorie_id = Column(String, ForeignKey("categories.title"))  # Clé étrangère vers la table catégories
+    link = Column(String, unique=True, nullable=False)
 
-    # Relation avec la catégorie
+    # Relation avec les produits
+    products = relationship("Produit", back_populates="categorie", cascade="all, delete-orphan")
+
+# ✅ Table des Produits
+class Produit(Base):
+    __tablename__ = "products"
+    __table_args__ = {"schema": "public"}  
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    link = Column(String, unique=True, nullable=False)
+    categorie_id = Column(Integer, ForeignKey("public.categories.id", ondelete="CASCADE"), nullable=False)  
+
     categorie = relationship("Categorie", back_populates="products")
-    #Tomalou
     details = relationship("ProduitDetails", back_populates="produit", uselist=False, cascade="all, delete-orphan")
 
 
-###############################----TOMALOU-------##########################################"
-
+# ✅ Table des Détails des Produits
 class ProduitDetails(Base):
     __tablename__ = "produits_details"
     __table_args__ = {"schema": "public"}  
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    produit_Id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    produit_id = Column(Integer, ForeignKey("public.products.id", ondelete="CASCADE"), nullable=False)
     url = Column(String, unique=True, nullable=False)
     discount = Column(String, nullable=True)
     
@@ -97,8 +98,3 @@ class Review(Base):
     reviewer_country = Column(String, nullable=True)
 
     produit_details = relationship("ProduitDetails", back_populates="reviews")
-
-
-# Création des tables
-from .database import engine
-Base.metadata.create_all(bind=engine)

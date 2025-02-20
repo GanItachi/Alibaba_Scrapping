@@ -104,8 +104,11 @@ services:
       - grafana_data:/var/lib/grafana # Persistance des dashboards
       - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards # Dashboards personnalisés (optionnel)
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin # À changer en prod !
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SECURITY_COOKIE_SAMESITE=none
+      - GF_SECURITY_COOKIE_SECURE=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     networks:
       - monitoring_network # Même réseau que Prometheus
     depends_on:

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Résultats du Scraping Alibaba</title>
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', path='images/favicon.ico') }}"
+      type="image/x-icon"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #e3f2fd;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+      .card:hover {
+        transform: scale(1.05);
+      }
+      .card-title {
+        color: #0277bd;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container text-center">
+      <h1 class="mb-4">📦 Produits Alibaba Scrapés</h1>
+      <div id="products" class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Les cartes produits seront injectées ici -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/scrape") // Appelle l'API FastAPI pour récupérer les données
+          .then((response) => response.json())
+          .then((data) => {
+            let productsContainer = document.getElementById("products");
+            Object.entries(data).forEach(([title, link]) => {
+              let card = `
+                            <div class="col">
+                                <div class="card h-100 p-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${title}</h5>
+                                        <a href="${link}" target="_blank" class="btn btn-primary">Voir sur Alibaba</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+              productsContainer.innerHTML += card;
+            });
+          })
+          .catch((error) =>
+            console.error("Erreur lors du chargement des produits", error)
+          );
+      });
+    </script>
+  </body>
+</html>

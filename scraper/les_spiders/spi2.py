@@ -25,11 +25,13 @@ def wait_for_scroll(driver, last_height, timeout=5):
 
 def lien_recup(lien):
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")  # Mode sans interface graphique
+    chrome_options.add_argument("--headless")  # Mode sans interface graphique
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--user-data-dir=/tmp/chrome-user-data")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+
     
     driver= webdriver.Chrome(options=chrome_options)
     try:
@@ -62,25 +64,26 @@ def lien_recup(lien):
         
         print("Défilement terminé")
         
-        results={}
+        results=[]
         
         # Exécution d'un script pour récupérer les données en une seule passe
         produits = driver.execute_script("""
-        var results = {};
-        var elements = document.querySelectorAll('.alimod-industry-products-waterfall .hugo4-pc-grid-item');
-        elements.forEach(element => {
-            var titleSpan = element.querySelector('span[title]');
-            var title = titleSpan ? titleSpan.getAttribute('title') : 'No title';
-            var links = element.querySelectorAll('a');
-            var hrefs = Array.from(links).map(a => a.href);
-            if (hrefs.length > 0) {
-                results[title] = (results[title] || []).concat(hrefs);
-            }
-        });
-        return results;
+            var results = [];
+            var elements = document.querySelectorAll('.alimod-industry-products-waterfall .hugo4-pc-grid-item');
+            elements.forEach(element => {
+                var titleSpan = element.querySelector('span[title]');
+                var title = titleSpan ? titleSpan.getAttribute('title') : 'No title';
+                var links = element.querySelectorAll('a');
+                var hrefs = Array.from(links).map(a => a.href);
+                hrefs.forEach(href => {
+                    results.push({ url: href, title: title });  // Ajoute un objet avec l'URL et le titre au tableau
+                });
+            });
+            return results;
+
         """)
         
-        results.update(produits)
+        results.extend(produits)
         
                 
     except Exception as e:
@@ -94,14 +97,18 @@ def lien_recup(lien):
 def get_categories_by_title(db: Session, keyword: str):
     return db.query(Categorie).filter(Categorie.title.ilike(f"%{keyword}%")).all()
     
-def spi2():
+    
+def spi2(title):
     db = SessionLocal()
-    categories = get_categories_by_title(db, "Meubles")  # Remplace par le mot-clé que tu cherches
+    categories = get_categories_by_title(db=db, keyword=title)  # Remplace par le mot-clé que tu cherches
     db.close()
-    results = {}
+    print(f"Categories récupérées: {categories}")
+    results = []
 
     for cat in categories:
-        results = lien_recup(cat.link)
+        results.extend(lien_recup(cat.link))  # Utilise extend pour ajouter les résultats de chaque catégorie
+
+
         
     return results
 

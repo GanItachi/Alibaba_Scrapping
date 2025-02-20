@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alibaba Scraper</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/New.css') }}"
+      media="screen"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    {% include 'header2.html' %}
+
+    <div class="main-container">
+      <div class="container large">
+        <h1>Alibaba Scraper</h1>
+        <form id="categoryForm">
+          <label for="categorie">Choisir une catégorie :</label>
+          <select id="categorie" name="categorie">
+            {% for category in categories %}
+            <option value="{{ category.title }}">{{ category.title }}</option>
+            {% endfor %}
+          </select>
+
+          <button type="submit" onclick="startScraping()">
+            Démarrer le Scraping
+          </button>
+        </form>
+        <div class="message">
+          {% if message %}
+          <p>{{ message }}</p>
+          {% endif %}
+        </div>
+        <div id="loading">
+          <p>Scraping en cours...</p>
+          <div class="spinner"></div>
+          <div class="pl">
+            <div class="pl__outer-ring"></div>
+            <div class="pl__inner-ring"></div>
+            <div class="pl__track-cover"></div>
+            <div class="pl__ball">
+              <div class="pl__ball-texture"></div>
+              <div class="pl__ball-outer-shadow"></div>
+              <div class="pl__ball-inner-shadow"></div>
+              <div class="pl__ball-side-shadows"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-container new">
+        <h2>Résultats du scraping :</h2>
+        {% if Ma_Cat %}
+        <span class="category-box">
+          <p>Catégorie :</p>
+          {% for cat in Ma_Cat %}
+          <a href="{{ cat.link }}" target="_blank">
+            <strong class="text_spec">{{ cat.title }}</strong>
+          </a>
+          {% endfor %}
+        </span>
+        {% endif %} {%if taille is defined %}
+        <span class="taille-badge"> {{ taille }} elements </span>
+        {% endif %}
+
+        <div class="scrollable">
+          <ul>
+            {% for prod in produits %}
+            <li>
+              <a href="{{ prod.link }}" target="_blank">{{ prod.title }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <h2>Exporter en JSON :</h2>
+        <label for="jsonOutput">Données JSON récupérées :</label>
+        {% if dicto %}
+        <textarea id="jsonOutput" readonly>
+            {{ dicto |tojson(indent=4) }}</textarea
+        >
+        {% else %}
+        <p>Aucune donnée disponible.</p>
+        {% endif %}
+        <div class="button-container">
+          <button onclick="copyJson()">Copier JSON</button>
+          <button onclick="downloadExcel()">Télécharger Excel</button>
+          <button onclick="downloadCSV()">Télécharger CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function startScraping() {
+        document.getElementById("loading").style.display = "block";
+      }
+
+      function copyJson() {
+        let jsonText = document.getElementById("jsonOutput");
+        jsonText.select();
+        document.execCommand("copy");
+        alert("JSON copié !");
+      }
+
+      function downloadCSV() {
+        let jsonData = {{ dicto | tojson | safe if dicto is defined else '[]' }};
+
+        if (!jsonData.length) {
+          alert("Aucune donnée à exporter !");
+          return;
+        }
+
+        // Création de l'en-tête CSV
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "URL,Titre\n"; // En-tête des colonnes
+
+        // Remplir le fichier CSV avec les données
+        jsonData.forEach(item => {
+          let row = `"${item.url}","${item.title}"\n`; // Chaque ligne
+          csvContent += row;
+        });
+
+        // Création du lien de téléchargement
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "produits.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+        function downloadExcel() {
+          let jsonData;
+
+          try {
+            jsonData = {{ dicto | tojson | safe if dicto is defined else '[]' }};
+          } catch (error) {
+            console.error("Erreur de JSON :", error);
+            jsonData = [];
+          }
+
+          if (!jsonData.length) {
+            alert("Aucune donnée à exporter !");
+            return;
+          }
+
+          let ws = XLSX.utils.json_to_sheet(jsonData);
+          let wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Produits");
+
+          XLSX.writeFile(wb, "produits.xlsx");
+        }
+
+      /********************************************/
+      document
+        .getElementById("categoryForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Empêcher le comportement par défaut
+
+          let selectedCategory = document.getElementById("categorie").value; // Récupérer la catégorie sélectionnée
+
+          if (selectedCategory) {
+            window.location.href = `/produits/${selectedCategory}`; // Rediriger vers l'URL avec la catégorie choisie
+          }
+        });
+    </script>
+  </body>
+</html>
