@@ -118,11 +118,28 @@ async def tb():
                 height: 100%;
                 border: none;
             }}
+            .fullscreen-btn {{
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 5px;
+                transition: 0.3s;
+            }}
+            .fullscreen-btn:hover {{
+                background-color: #0056b3;
+            }}
         </style>
     </head>
     <body>
-        <div class="container">
-            
+    
+        <div class="container" id="iframeContainer">
+            <button class="fullscreen-btn" onclick="toggleFullScreen()">⛶ Plein écran</button>
             <iframe 
                 src="http://localhost:3100/d/ganitachi/dash2?orgId=1&from=1739482925152&to=1739486525152&theme=light"
                 width="100%"
@@ -131,6 +148,32 @@ async def tb():
                 allowfullscreen>
             </iframe>
         </div>
+        <script>
+            function toggleFullScreen() {{
+                var iframeContainer = document.getElementById("iframeContainer");
+                if (!document.fullscreenElement) {{
+                    if (iframeContainer.requestFullscreen) {{
+                        iframeContainer.requestFullscreen();
+                    }} else if (iframeContainer.mozRequestFullScreen) {{
+                        iframeContainer.mozRequestFullScreen();
+                    }} else if (iframeContainer.webkitRequestFullscreen) {{
+                        iframeContainer.webkitRequestFullscreen();
+                    }} else if (iframeContainer.msRequestFullscreen) {{
+                        iframeContainer.msRequestFullscreen();
+                    }}
+                }} else {{
+                    if (document.exitFullscreen) {{
+                        document.exitFullscreen();
+                    }} else if (document.mozCancelFullScreen) {{
+                        document.mozCancelFullScreen();
+                    }} else if (document.webkitExitFullscreen) {{
+                        document.webkitExitFullscreen();
+                    }} else if (document.msExitFullscreen) {{
+                        document.msExitFullscreen();
+                    }}
+                }}
+            }}
+        </script>
     </body>
     </html>
     """
