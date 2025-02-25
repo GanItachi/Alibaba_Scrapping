@@ -65,20 +65,46 @@ def lien_recup(lien):
         print("Défilement terminé")
         
         results=[]
-        
+         
         # Exécution d'un script pour récupérer les données en une seule passe
         produits = driver.execute_script("""
             var results = [];
             var elements = document.querySelectorAll('.alimod-industry-products-waterfall .hugo4-pc-grid-item');
+
             elements.forEach(element => {
+                // Extraction du titre
                 var titleSpan = element.querySelector('span[title]');
                 var title = titleSpan ? titleSpan.getAttribute('title') : 'No title';
+
+                // Extraction du prix normal
+                var priceElement = element.querySelector('.hugo3-util-ellipsis.hugo3-fw-heavy.hugo3-fz-medium') ||
+                                element.querySelector('.price-discount-wrap.price-origin.hugo3-f.hugo3-fc-light');
+                var price = priceElement ? priceElement.textContent.trim() : 'No price';
+
+                // Extraction du prix réduit (s'il y a une promotion)
+                var discountedPriceElement = element.querySelector('.price-promotion.hugo3-fc-high.hugo3-fw-heavy.hugo3-fz-medium');
+                var discountedPrice = discountedPriceElement ? discountedPriceElement.textContent.trim() : 'No discount';
+
+                // Extraction de la commande minimale
+                var minOrderElement = element.querySelector('span.moq-number');
+                var minOrder = minOrderElement ? minOrderElement.textContent.trim() : 'No min order';
+
+                // Extraction des liens
                 var links = element.querySelectorAll('a');
                 var hrefs = Array.from(links).map(a => a.href);
+
+                // Ajout des résultats
                 hrefs.forEach(href => {
-                    results.push({ url: href, title: title });  // Ajoute un objet avec l'URL et le titre au tableau
+                    results.push({
+                        url: href,
+                        title: title,
+                        price: price,
+                        discounted_price: discountedPrice,
+                        min_order: minOrder
+                    });
                 });
             });
+
             return results;
 
         """)
@@ -93,7 +119,8 @@ def lien_recup(lien):
         driver.quit()
         
     return results
-    
+
+
 def get_categories_by_title(db: Session, keyword: str):
     return db.query(Categorie).filter(Categorie.title.ilike(f"%{keyword}%")).all()
     

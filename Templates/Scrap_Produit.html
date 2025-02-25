@@ -94,79 +94,89 @@
     </div>
 
     <script>
-      function startScraping() {
-        document.getElementById("loading").style.display = "block";
-      }
-
-      function copyJson() {
-        let jsonText = document.getElementById("jsonOutput");
-        jsonText.select();
-        document.execCommand("copy");
-        alert("JSON copié !");
-      }
-
-      function downloadCSV() {
-        let jsonData = {{ dicto | tojson | safe if dicto is defined else '[]' }};
-
-        if (!jsonData.length) {
-          alert("Aucune donnée à exporter !");
-          return;
+        function startScraping() {
+          document.getElementById("loading").style.display = "block";
         }
 
-        // Création de l'en-tête CSV
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "URL,Titre\n"; // En-tête des colonnes
+        function copyJson() {
+          let jsonText = document.getElementById("jsonOutput");
+          jsonText.select();
+          document.execCommand("copy");
+          alert("JSON copié !");
+        }
 
-        // Remplir le fichier CSV avec les données
-        jsonData.forEach(item => {
-          let row = `"${item.url}","${item.title}"\n`; // Chaque ligne
-          csvContent += row;
-        });
+        function downloadCSV() {
+          let jsonData = {{ dicto | tojson | safe if dicto is defined else '[]' }};
 
-        // Création du lien de téléchargement
-        let encodedUri = encodeURI(csvContent);
-        let link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "produits.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+          if (!jsonData.length) {
+              alert("Aucune donnée à exporter !");
+              return;
+          }
+
+          // Création de l'en-tête CSV
+          let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Ajout de BOM UTF-8 pour éviter les erreurs d'encodage
+          csvContent += "URL,Titre,Commande Minimale,Prix,Prix Réduit\n"; // Nouvel en-tête des colonnes
+
+          // Remplir le fichier CSV avec les données
+          jsonData.forEach(item => {
+              let row = `"${item.url}","${item.title}","${item.min_order}","${item.price}","${item.discounted_price}"\n`;
+              csvContent += row;
+          });
+
+          // Création du lien de téléchargement
+          let encodedUri = encodeURI(csvContent);
+          let link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "produits.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
       }
 
         function downloadExcel() {
           let jsonData;
 
           try {
-            jsonData = {{ dicto | tojson | safe if dicto is defined else '[]' }};
+              jsonData = {{ dicto | tojson | safe if dicto is defined else '[]' }};
           } catch (error) {
-            console.error("Erreur de JSON :", error);
-            jsonData = [];
+              console.error("Erreur de JSON :", error);
+              jsonData = [];
           }
 
           if (!jsonData.length) {
-            alert("Aucune donnée à exporter !");
-            return;
+              alert("Aucune donnée à exporter !");
+              return;
           }
 
-          let ws = XLSX.utils.json_to_sheet(jsonData);
+          // Transformer les données JSON en un format compatible avec Excel
+          let formattedData = jsonData.map(item => ({
+              "URL": item.url,
+              "Titre": item.title,
+              "Commande Minimale": item.min_order,
+              "Prix": item.price,
+              "Prix Réduit": item.discounted_price
+          }));
+
+          let ws = XLSX.utils.json_to_sheet(formattedData);
           let wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, "Produits");
 
           XLSX.writeFile(wb, "produits.xlsx");
-        }
-
-      /********************************************/
-      document
-        .getElementById("categoryForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault(); // Empêcher le comportement par défaut
-
-          let selectedCategory = document.getElementById("categorie").value; // Récupérer la catégorie sélectionnée
-
-          if (selectedCategory) {
-            window.location.href = `/produits/${selectedCategory}`; // Rediriger vers l'URL avec la catégorie choisie
           }
-        });
+
+
+        /********************************************/
+        document
+          .getElementById("categoryForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault(); // Empêcher le comportement par défaut
+
+            let selectedCategory = document.getElementById("categorie").value; // Récupérer la catégorie sélectionnée
+
+            if (selectedCategory) {
+              window.location.href = `/produits/${selectedCategory}`; // Rediriger vers l'URL avec la catégorie choisie
+            }
+          });
     </script>
   </body>
 </html>

@@ -16,6 +16,7 @@ from api.database import SessionLocal
 import sys
 # Ajouter le répertoire racine au PYTHONPATH
 from pathlib import Path
+import tempfile
 root_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(root_dir))
 import os
@@ -26,24 +27,46 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 def setup_driver():
     """Configure et retourne le driver Chrome avec les options optimales."""
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--log-level=3")
-    options.add_argument("--disable-blink-features=AutomationControlled")
+    # options = Options()
+    # options.add_argument("--headless")
+    # options.add_argument("--disable-gpu")
+    # options.add_argument("--log-level=3")
+    # options.add_argument("--disable-blink-features=AutomationControlled")
     
-    # Configuration pour éviter la détection
-    options.add_experimental_option("prefs", {
-        "translate": {"enabled": False},
-        "intl.accept_languages": "en,en-US"
-    })
+    # # Configuration pour éviter la détection
+    # options.add_experimental_option("prefs", {
+    #     "translate": {"enabled": False},
+    #     "intl.accept_languages": "en,en-US"
+    # })
     
-    options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
-    )
+    # options.add_argument(
+    #     "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
+    # )
+    #service = Service()
+    #return webdriver.Chrome(service=service, options=options)
+    chrome_options = webdriver.ChromeOptions()
+    
+    # Temporary profile directory
+    chrome_options.add_argument(f"--user-data-dir={tempfile.mkdtemp()}")
+    
+    # Headless configuration (optional)
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    
+    # Shared memory configuration
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    
+        # Configuration pour éviter la détection
+    chrome_options.add_experimental_option("prefs", {
+         "translate": {"enabled": False},
+         "intl.accept_languages": "en,en-US"
+     })
     
     service = Service()
-    return webdriver.Chrome(service=service, options=options)
+    
+    return webdriver.Chrome(service=service, options=chrome_options)
+    
 
 def scroll_page(driver):
     """Scroll progressif de la page."""

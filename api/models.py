@@ -18,6 +18,9 @@ class Produit(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     link = Column(String)
+    min_order = Column(String, nullable=True)  # Commande minimale
+    price = Column(String, nullable=True)  # Prix normal
+    discounted_price = Column(String, nullable=True)  # Prix réduit
     categorie_id = Column(String, ForeignKey("categories.title"))  # Clé étrangère vers la table catégories
 
     # Relation avec la catégorie

@@ -16,6 +16,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from fastapi.responses import JSONResponse
 from pathlib import Path
+from scraper.les_spiders.spi3 import spi3,setup_driver, scrape_product_pricing, scrape_product, scrape_product_attributes, scrape_reviews, extract_supplier_info
 
 
 
@@ -243,9 +244,12 @@ async def produits_par_categorie(title: str, request: Request, db: Session = Dep
     taille = len(scraped_data)
     for item in scraped_data:  # itérer sur chaque objet dans le tableau
         titre = item['title']  # récupère le titre
-        link = item['url']  # récupère l'URL
+        link = item['url']
+        price = item['price']# récupère l'URL
+        discounted_price = item['discounted_price']
+        min_order = item['min_order']
         if link:  # Vérifie que le lien n'est pas vide
-            produit = Produit(title=titre, link=link, categorie_id=title)  # Utilise le titre pour la catégorie
+            produit = Produit(title=titre, link=link,price=price, discounted_price=discounted_price,min_order=min_order, categorie_id=title)  # Utilise le titre pour la catégorie
             db.add(produit)
     db.commit()
 
@@ -265,7 +269,29 @@ async def produits_par_categorie(title: str, request: Request, db: Session = Dep
         "Ma_Cat" : Ma_Cat,
         "taille" : taille
     })
+    
+@app.get("/scra", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
+@app.post("/Scraprod")
+async def scrapeprod(url: str):
+    # driver = setup_driver()
+    # driver.get(url)
 
+    # data = {
+    #     "pricing": scrape_product_pricing(driver),
+    #     "attributes": scrape_product_attributes(driver),
+    #     "reviews": scrape_reviews(driver, url),
+    #     "supplier": extract_supplier_info(driver),
+    # }
+    
+
+    #driver.quit()
+    
+    data = spi3(url)
+    
+    
+    return data
 
 

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alibaba Scraper</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/New.css') }}"
+      media="screen"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/Home.css') }}"
+      media="screen"
+    />
+  </head>
+  <body>
+    {% include 'header2.html' %}
+
+    <div class="main-container">
+      <div class="container large">
+        <h1>Alibaba Scraper</h1>
+        <form action="/Scraprod" method="post" onsubmit="startScraping()">
+          <label for="url">URL du produit :</label>
+          <input type="text" name="url" id="url" required />
+          <button type="submit">Démarrer le Scraping</button>
+        </form>
+        <div id="loading" style="display: none">
+          <p>Scraping en cours...</p>
+          <div class="spinner"></div>
+          <div class="pl">
+            <div class="pl__outer-ring"></div>
+            <div class="pl__inner-ring"></div>
+            <div class="pl__track-cover"></div>
+            <div class="pl__ball">
+              <div class="pl__ball-texture"></div>
+              <div class="pl__ball-outer-shadow"></div>
+              <div class="pl__ball-inner-shadow"></div>
+              <div class="pl__ball-side-shadows"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-container new">
+        <div class="results-header">
+          <h2>Résultats du scraping :</h2>
+        </div>
+
+        <div id="result" class="scrollable"></div>
+      </div>
+    </div>
+
+    <script>
+      function startScraping() {
+        document.getElementById("loading").style.display = "block";
+      }
+
+      document.querySelector("form").onsubmit = async function (e) {
+        e.preventDefault();
+        const url = document.querySelector("input[name='url']").value;
+        const response = await fetch(`/Scraprod?url=${url}`, {
+          method: "POST",
+        });
+        const data = await response.json();
+        document.getElementById("result").innerHTML = `<pre>${JSON.stringify(
+          data,
+          null,
+          2
+        )}</pre>`;
+        document.getElementById("loading").style.display = "none";
+      };
+    </script>
+  </body>
+</html>
