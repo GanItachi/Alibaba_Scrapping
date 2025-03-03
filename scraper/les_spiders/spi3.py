@@ -278,12 +278,10 @@ def scrape_reviews(driver, product_url):
     return review_data
 
 def extract_supplier_info(driver):
-    """Extraction des informations fournisseur selon votre fonction originale."""
     try:
         scroll_page(driver)
-        
         WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".company-name a"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".id-relative.id-overflow-hidden.id-rounded-lg"))
         )
         logging.info("✅ Module du fournisseur trouvé !")
 
@@ -291,49 +289,55 @@ def extract_supplier_info(driver):
 
         def extract_text_safe(soup, selectors, default="NA"):
             for selector in selectors:
-                element = soup.select_one(selector)
-                if element:
-                    return element.get_text(strip=True)
+                try:
+                    element = soup.select_one(selector)
+                    if element:
+                        return element.get_text(strip=True)
+                except Exception as e:
+                    logging.warning(f"⚠️ Erreur avec le sélecteur {selector} : {e}")
             return default
 
         def extract_experience(soup):
-            for item in soup.select(".header-item span"):
-                text = item.get_text(strip=True)
-                match = re.search(r"(\d+)\s*(?:ans|years|yrs|mois|months|-Year)", text, re.IGNORECASE)
-                if match:
-                    return f"{match.group(1)} ans"
-            return "NA"
+            text = extract_text_safe(soup, [".id-flex.id-items-center.id-text-xs"])
+            match = re.search(r"(\d+)\s*(?:ans|years|yrs)", text, re.IGNORECASE)
+            return f"{match.group(1)} ans" if match else "NA"
 
         def extract_supplier_type(soup):
-            selectors = [".header-item:nth-child(2) span", ".supplier-type"]
-            text = extract_text_safe(soup, selectors, default="NA")
-            if re.match(r"^\d+\s*(ans|years|yrs)$", text, re.IGNORECASE):
-                return "NA"
-            return text
+            text = extract_text_safe(soup, [".id-flex.id-items-center.id-text-xs"])
+            if "Manufacturer" in text or "Trading Company" in text or "Custom manufacturer" in text:
+                parts = text.split("on Alibaba.com")
+                return parts[0].strip() if "on Alibaba.com" in text else text
+            return "NA"
 
         def extract_location(soup):
-            location = extract_text_safe(soup, [".header-item span:last-child"], default="NA")
-            location = location.replace("Pays/Région :", "").replace("Located in", "").strip()
-            if re.match(r"^\d+\s*(ans|years|yrs)$", location, re.IGNORECASE):
+            # Recherche basée sur le texte "Located in" avec BeautifulSoup
+            try:
+                location_elements = soup.find_all("span", text=lambda text: text and "Located in" in text)
+                for element in location_elements:
+                    if "Located in" in element.get_text(strip=True):
+                        location = element.get_text(strip=True)
+                        return location.replace("Located in", "").strip()
+                # Fallback avec sélecteurs CSS si texte non trouvé
+                location = extract_text_safe(soup, [
+                    ".id-mt-1.id-flex.id-items-center.id-gap-0.5.id-text-xs span",
+                    ".id-text-xs span"
+                ])
+                return location.replace("Located in", "").strip() if location and "Located in" in location else "NA"
+            except Exception as e:
+                logging.error(f"⚠️ Erreur lors de l'extraction de la localisation : {e}")
                 return "NA"
-            return location
-
+            
         title_map = {
             "rating": "Évaluation du magasin",
-            "évaluation": "Évaluation du magasin",
+            "store rating": "Évaluation du magasin",
             "on-time delivery": "Taux de livraison",
-            "livraison": "Taux de livraison",
             "response time": "Temps de réponse",
-            "temps": "Temps de réponse",
             "revenue": "Chiffre d'affaires",
-            "chiffre d'affaires": "Chiffre d'affaires",
+            "online revenue": "Chiffre d'affaires",
             "floorspace": "Surface au sol",
-            "surface": "Surface au sol",
-            "superficie": "Surface au sol",
-            "personnel": "Personnel",
             "staff": "Personnel",
             "markets": "Principaux marchés",
-            "marchés": "Principaux marchés",
+            "main markets": "Principaux marchés"
         }
 
         attributes = {
@@ -343,39 +347,63 @@ def extract_supplier_info(driver):
             "Chiffre d'affaires": "NA",
             "Surface au sol": "NA",
             "Personnel": "NA",
-            "Principaux marchés": "NA",
+            "Principaux marchés": "NA"
         }
 
-        for item in soup.select(".attr-item"):
-            title_elem = item.select_one(".attr-title")
-            content_elem = item.select_one(".attr-content")
+        performance_section = soup.select_one(".id-z-10.id-mt-5.id-rounded-lg.id-bg-white")
+        if performance_section:
+            for button in performance_section.select("button"):
+                title_elem = button.select_one(".company_card_online_performance_value")
+                content_elem = button.select_one(".id-text-xl.id-font-semibold")
+                if title_elem and content_elem:
+                    title = re.sub(r"\s+", " ", title_elem.get_text(strip=True).lower())
+                    content = content_elem.get_text(strip=True)
+                    for key, value in title_map.items():
+                        if key in title:
+                            attributes[value] = content
+                            break
 
-            if title_elem and content_elem:
-                title = re.sub(r"\s+", " ", title_elem.get_text(strip=True).lower())
-                content = content_elem.get_text(strip=True)
+        markets = []
+        markets_section = soup.select(".id-mt-3.id-flex.id-flex-wrap.id-items-center .id-flex.id-items-center span.id-ms-1.id-text-xs")
+        if markets_section:
+            markets = [market.text.strip() for market in markets_section]
+        attributes["Principaux marchés"] = ", ".join(markets) if markets else "NA"
 
-                for key, value in title_map.items():
-                    if key in title:
-                        attributes[value] = content
-                        break
-
-        supplier_link = soup.select_one(".company-name a")
-        supplier_url = supplier_link["href"] if supplier_link else "NA"
+        overview_section = soup.select_one(".id-mt-4.id-grid.id-w-full.id-grid-flow-row.id-grid-cols-2")
+        if overview_section:
+            for item in overview_section.select("div.id-truncate"):
+                text = item.get("title", "NA")
+                if "Floorspace" in text:
+                    attributes["Surface au sol"] = text.replace("Floorspace:", "").strip()
+                elif "Staff" in text:
+                    attributes["Personnel"] = text.replace("Staff:", "").strip()
 
         data = {
-            "Nom du fournisseur": extract_text_safe(soup, [".company-name a"]),
-            "Profil du fournisseur": supplier_url,
+            "Nom du fournisseur": extract_text_safe(soup, [".id-text-sm.id-font-semibold.id-underline"]),
+            "Profil du fournisseur": soup.select_one(".id-text-sm.id-font-semibold.id-underline")["href"] if soup.select_one(".id-text-sm.id-font-semibold.id-underline") else "NA",
             "Type de fournisseur": extract_supplier_type(soup),
             "Années d'expérience": extract_experience(soup),
             "Localisation": extract_location(soup),
         }
-
         data.update(attributes)
         return data
 
     except Exception as e:
-        logging.error(f"Erreur lors de l'extraction des données fournisseur : {e}")
-        return None
+        logging.error(f"❌ Erreur lors de l'extraction des données fournisseur : {e}")
+        return {
+            "Nom du fournisseur": "NA",
+            "Profil du fournisseur": "NA",
+            "Type de fournisseur": "NA",
+            "Années d'expérience": "NA",
+            "Localisation": "NA",
+            "Évaluation du magasin": "NA",
+            "Taux de livraison": "NA",
+            "Temps de réponse": "NA",
+            "Chiffre d'affaires": "NA",
+            "Surface au sol": "NA",
+            "Personnel": "NA",
+            "Principaux marchés": "NA"
+        }
 
 def scrape_product(url):
     """Fonction principale de scraping."""

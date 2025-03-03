@@ -85,20 +85,84 @@
         {% else %}
         <p>Aucune donnée disponible.</p>
         {% endif %}
-        <button onclick="copyJson()">Copier JSON</button>
+        <div class="button-container">
+          <button onclick="copyJson()">Copier JSON</button>
+          <button onclick="downloadCSV_Categories()">
+            Télécharger les catégories (CSV)
+          </button>
+          <button onclick="downloadExcel_Categories()">
+            Télécharger les catégories (Excel)
+          </button>
+        </div>
       </div>
     </div>
 
     <script>
-      function startScraping() {
-        document.getElementById("loading").style.display = "block";
+        function startScraping() {
+          document.getElementById("loading").style.display = "block";
+        }
+
+        function copyJson() {
+          let jsonText = document.getElementById("jsonOutput");
+          jsonText.select();
+          document.execCommand("copy");
+          alert("JSON copié !");
+        }
+
+        function downloadCSV_Categories() {
+          let jsonData = {{ categories_data | tojson | safe if categories_data is defined else '[]' }};
+
+          if (!jsonData.length) {
+              alert("Aucune donnée à exporter !");
+              return;
+          }
+
+          // Création de l'en-tête CSV
+          let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM UTF-8 pour encodage correct
+          csvContent += "URL,Titre\n"; // En-têtes
+
+          // Remplir le fichier CSV avec les données
+          jsonData.forEach(item => {
+              let row = `"${item.url}","${item.title}"\n`;
+              csvContent += row;
+          });
+
+          // Création du lien de téléchargement
+          let encodedUri = encodeURI(csvContent);
+          let link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "categories.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
       }
 
-      function copyJson() {
-        let jsonText = document.getElementById("jsonOutput");
-        jsonText.select();
-        document.execCommand("copy");
-        alert("JSON copié !");
+      function downloadExcel_Categories() {
+          let jsonData;
+
+          try {
+              jsonData = {{ categories_data | tojson | safe if categories_data is defined else '[]' }};
+          } catch (error) {
+              console.error("Erreur de JSON :", error);
+              jsonData = [];
+          }
+
+          if (!jsonData.length) {
+              alert("Aucune donnée à exporter !");
+              return;
+          }
+
+          // Transformer les données JSON en un format compatible avec Excel
+          let formattedData = jsonData.map(item => ({
+              "URL": item.url,
+              "Titre": item.title
+          }));
+
+          let ws = XLSX.utils.json_to_sheet(formattedData);
+          let wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Catégories");
+
+          XLSX.writeFile(wb, "categories.xlsx");
       }
     </script>
   </body>

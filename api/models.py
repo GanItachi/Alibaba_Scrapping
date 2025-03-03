@@ -18,11 +18,12 @@ class Produit(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     link = Column(String)
-    min_order = Column(String, nullable=True)  # Commande minimale
-    price = Column(String, nullable=True)  # Prix normal
     discounted_price = Column(String, nullable=True)  # Prix réduit
     categorie_id = Column(String, ForeignKey("categories.title"))  # Clé étrangère vers la table catégories
-
+    price_min = Column(Float, nullable=True)
+    price_max = Column(Float, nullable=True)
+    min_order_qty = Column(Integer, nullable=True)  # Nombre minimal à commander
+    min_order_unit = Column(String, nullable=True)  # Unité (ex: "Pieces", "Sets")
     # Relation avec la catégorie
     categorie = relationship("Categorie", back_populates="products")
     #Tomalou

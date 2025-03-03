@@ -1,0 +1,56 @@
+# Utilisation de l’image Python
+FROM python:3.10
+
+
+
+RUN apt-get update && apt-get install -y \
+    wget unzip curl \
+    && wget -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i /tmp/chrome.deb || apt-get -fy install \
+    && rm -rf /tmp/chrome.deb
+
+# ✅ Installe ChromeDriver (assure-toi que la version correspond à Chrome)
+# RUN CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
+#     wget -q "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" -O /tmp/chromedriver.zip && \
+#     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
+#     chmod +x /usr/local/bin/chromedriver && \
+#     rm /tmp/chromedriver.zip
+# Installer les dépendances nécessaires
+# RUN apt-get update && apt-get install -y wget unzip
+
+
+# Télécharger et installer ChromeDriver
+RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.53/linux64/chromedriver-linux64.zip"  -O /tmp/chromedriver.zip && \
+    unzip /tmp/chromedriver.zip -d /tmp/ && \
+    mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
+    chmod +x /usr/local/bin/chromedriver && \
+    rm -rf /tmp/chromedriver.zip /tmp/chromedriver-linux64
+
+RUN apt-get update && \
+    apt-get install -y \
+    libglib2.0-0 \
+    libnss3 \
+    libxss1 \
+    libappindicator3-1 \
+    libasound2 \
+    wget \
+    curl \
+    ca-certificates \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN rm -rf /tmp/chrome-user-data
+
+
+# Définition du dossier de travail
+WORKDIR /app
+
+# Copier les fichiers
+COPY . .
+
+# Installation des dépendances
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Commande pour exécuter Celery Worker
+CMD ["celery", "-A", "api.celery_config.celery_app", "worker", "--loglevel=info"]

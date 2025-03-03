@@ -1,4 +1,4 @@
- .u-section-1 {
+.u-section-1 {
   min-height: 698px;
   background-image: none;
 }
@@ -25,7 +25,7 @@
   font-weight: 700;
   font-size: 4.5rem;
   line-height: 1.1;
-  text-shadow: -2px 2px 3px rgba(255,255,255,1);
+  text-shadow: -2px 2px 3px rgba(255, 255, 255, 1);
   --animation-custom_in-translate_x: -300px;
   --animation-custom_in-translate_y: 0px;
   margin: 142px 0 0;
@@ -60,7 +60,7 @@
 }
 
 @media (max-width: 1199px) {
-   .u-section-1 {
+  .u-section-1 {
     min-height: 600px;
   }
 
@@ -88,7 +88,7 @@
 }
 
 @media (max-width: 991px) {
-   .u-section-1 {
+  .u-section-1 {
     min-height: 429px;
   }
 
@@ -112,7 +112,7 @@
 }
 
 @media (max-width: 767px) {
-   .u-section-1 {
+  .u-section-1 {
     min-height: 652px;
   }
 
@@ -137,7 +137,7 @@
 }
 
 @media (max-width: 575px) {
-   .u-section-1 {
+  .u-section-1 {
     min-height: 448px;
   }
 
@@ -161,7 +161,8 @@
     width: 340px;
     height: 409px;
   }
-} .u-section-2 {
+}
+.u-section-2 {
   background-image: none;
 }
 
@@ -176,7 +177,7 @@
   --animation-custom_in-rotate: 0deg;
   --animation-custom_in-scale: 1;
   font-weight: 900;
-  text-shadow: -7px 5px 8px rgba(128,128,128,1);
+  text-shadow: -7px 5px 8px rgba(128, 128, 128, 1);
   text-decoration: underline !important;
   text-transform: uppercase;
   margin: 61px auto 0;
@@ -432,7 +433,8 @@
   .u-section-2 .u-group-3 {
     margin-right: 12px;
   }
-}.u-section-3 .u-sheet-1 {
+}
+.u-section-3 .u-sheet-1 {
   min-height: 1249px;
 }
 
@@ -445,7 +447,7 @@
   --animation-custom_in-scale: 0.3;
   font-size: 4.5rem;
   font-weight: 900;
-  text-shadow: 2px 2px 8px rgba(0,0,0,1);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 1);
   margin: 60px auto 0;
 }
 
@@ -456,7 +458,7 @@
 }
 
 .u-section-3 .u-image-1 {
-  background-image: url("images/WhatIsWebScrapingandWhatIsItUsedFor_.jpg");
+  background-image: url("/static/images/WhatIsWebScrapingandWhatIsItUsedFor_.jpg");
   background-position: 50% 50%;
   min-height: 453px;
   --animation-custom_in-translate_x: 0px;
@@ -520,7 +522,7 @@
 
 .u-section-3 .u-image-2 {
   min-height: 453px;
-  background-image: url("images/TheEssentialRoleOfASP_NETDevelopersInSoftwareDevelopment.jpg");
+  background-image: url("/static/images/TheEssentialRoleOfASP_NETDevelopersInSoftwareDevelopment.jpg");
   background-position: 50% 50%;
   --animation-custom_in-translate_x: 0px;
   --animation-custom_in-translate_y: 0px;
@@ -694,7 +696,8 @@
   .u-section-3 .u-image-2 {
     min-height: 405px;
   }
-} .u-section-4 {
+}
+.u-section-4 {
   background-image: linear-gradient(to right, #478ac9, #db545a);
   min-height: 885px;
 }
@@ -707,7 +710,7 @@
 
 .u-section-4 .u-list-1 {
   width: 995px;
-  margin: -149px calc(((100% - 1140px) / 2)  + 56px) 0 auto;
+  margin: -149px calc(((100% - 1140px) / 2) + 56px) 0 auto;
 }
 
 .u-section-4 .u-repeater-1 {
@@ -872,7 +875,7 @@
 }
 
 @media (max-width: 1199px) {
-   .u-section-4 {
+  .u-section-4 {
     min-height: 902px;
   }
 
@@ -932,7 +935,7 @@
 }
 
 @media (max-width: 991px) {
-   .u-section-4 {
+  .u-section-4 {
     min-height: 1207px;
   }
 
@@ -987,7 +990,7 @@
 }
 
 @media (max-width: 767px) {
-   .u-section-4 {
+  .u-section-4 {
     min-height: 1596px;
   }
 
@@ -1035,7 +1038,7 @@
 }
 
 @media (max-width: 575px) {
-   .u-section-4 {
+  .u-section-4 {
     min-height: 2190px;
   }
 

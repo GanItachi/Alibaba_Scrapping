@@ -136,18 +136,18 @@ def store_data(db: Session, clean_data: dict, url: str):
         # 2️⃣ ✅ Insertion du fournisseur
         supplier_data = clean_data.get("supplier", {})
         supplier = Supplier(
-            company_name=supplier_data.get("company_name"),
-            company_profile_link=supplier_data.get("company_profile_link"),
-            supplier_type=supplier_data.get("supplier_type"),
-            experience_years=supplier_data.get("experience_years"),
-            location=supplier_data.get("location"),
-            store_rating=supplier_data.get("store_rating"),
-            delivery_rate=supplier_data.get("delivery_rate"),
-            response_time=supplier_data.get("response_time"),
-            revenue=supplier_data.get("revenue"),
-            floorspace=supplier_data.get("floorspace"),
-            staff=supplier_data.get("staff"),
-            main_markets=supplier_data.get("main_markets"),
+            company_name=supplier_data.get("Nom du fournisseur"),
+            company_profile_link=supplier_data.get("Profil du fournisseur"),
+            supplier_type=supplier_data.get("Type de fournisseur"),
+            experience_years=supplier_data.get("Années d'expérience"),
+            location=supplier_data.get("Localisation"),
+            store_rating=supplier_data.get("Évaluation du magasin"),
+            delivery_rate=supplier_data.get("Taux de livraison"),
+            response_time=supplier_data.get("Temps de réponse"),
+            revenue=supplier_data.get("Chiffre d'affaires"),
+            floorspace=supplier_data.get("Surface au sol"),
+            staff=supplier_data.get("Personnel"),
+            main_markets=supplier_data.get("Principaux marchés"),
         )
         db.add(supplier)
         db.commit()
@@ -201,5 +201,42 @@ def store_data(db: Session, clean_data: dict, url: str):
         db.close()  # Fermeture de la session proprement
 
 
+def format_price(price_str):
+    """Nettoie et transforme une chaîne de prix en valeurs exploitables"""
+    if not price_str or price_str.lower() == "no price":
+        return None, None  # Aucun prix trouvé
+    
+    # Extraction des nombres flottants (ex: "$13.50-24.00" → ["13.50", "24.00"])
+    values = re.findall(r"\d+\.\d+|\d+", price_str)
+    
+    if len(values) == 2:  # Intervalle détecté
+        price_min = float(values[0])
+        price_max = float(values[1])
+    elif len(values) == 1:  # Prix fixe
+        price_min = price_max = float(values[0])
+    else:
+        return None, None  # Si aucun prix n'a été trouvé
+
+    return price_min, price_max
+
+def parse_min_order(min_order: str):
+    """
+    Extrait la quantité et l'unité de la commande minimale.
+    Ex: "5 Pieces" -> (5, "Pieces")
+        "10 Tons" -> (10, "Tons")
+        "No min order" -> (None, None)
+    """
+    if not min_order or "No" in min_order:
+        return None, None
+
+    match = re.match(r"(\d+)\s*(\w+)", min_order)
+    if match:
+        qty = int(match.group(1))
+        unit = match.group(2)
+        if unit.endswith('s'):  # Vérifie si l'unité se termine par "s"
+            unit = unit[:-1]  # Retire le dernier caractère (le "s")
+        return qty, unit
+    
+    return None, None
 
 

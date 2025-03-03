@@ -82,6 +82,19 @@ services:
   # - redis
   #- api
 
+  celery_worker:
+    build:
+      context: .
+      dockerfile: api/Dockerfile.celery
+    container_name: celery_worker
+    depends_on:
+      - redis
+      - api
+    volumes:
+      - ./:/app
+    networks:
+      - monitoring_network #
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus
