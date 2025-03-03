@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from scraper.les_spiders.spi1 import scrape_alibaba # Assure-toi que cette fonction existe et fonctionne
 from scraper.les_spiders.spi2 import spi2
 
-,kjà
+
 @celery_app.task
 def scrape_and_store():
     db: Session = SessionLocal()  # Récupérer une nouvelle session propre à Celery
